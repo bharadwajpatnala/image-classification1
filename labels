@@ -1,0 +1,96 @@
+import numpy as np
+import os # used for navigating to image path
+import imageio # used for writing images
+naimg_dict = {} # id: breed
+f = open("labels.csv", "r")
+fileContents = f.read()
+fileContents = fileContents.split('\n')
+for i in range(len(fileContents)-1):
+  fileContents[i] = fileContents[i].split(',')
+  naming_dict[fileContents[i][0]] = fileContents[i][1]
+  
+  breeds = naming_dict.values()
+breed_set = set(breeds)
+counting_dict = {}
+for i in breed_set:
+  counting_dict[i] = 0
+  for img in os.listdir('./raw_data'):
+  imgName = img.split('.')[0] # converts '0913209.jpg' --> '0913209'
+  label = naming_dict[str(imgName)]
+  counting_dict[label] += 1
+  path = os.path.join('./raw_data', img)
+  saveName = './labeled_train/' + label + '-' + str(counting_dict[label]) + '.jpg'
+  image_data = np.array(Image.open(path))
+  imageio.imwrite(saveName, image_data)
+  
+  def label_img(name):
+  word_label = name.split('-')[0]
+  if word_label == 'golden_retriever' : return np.array([1, 0])
+  elif word_label == 'shetland_sheepdog' : return np.array([0, 1])
+  
+  model.add(Dense(2, activation = 'softmax'))
+  
+  def get_size_statistics(DIR):
+  heights = []
+  widths = []
+  for img in os.listdir(DIR): 
+    path = os.path.join(DIR, img)
+    data = np.array(Image.open(path)) #PIL Image library
+    heights.append(data.shape[0])
+    widths.append(data.shape[1])
+  avg_height = sum(heights) / len(heights)
+  avg_width = sum(widths) / len(widths)
+  print("Average Height: " + str(avg_height))
+  print("Max Height: " + str(max(heights)))
+  print("Min Height: " + str(min(heights)))
+  print('\n')
+  print("Average Width: " + str(avg_width))
+  print("Max Width: " + str(max(widths)))
+  print("Min Width: " + str(min(widths)))
+  
+  IMG_SIZE = 300
+def load_training_data():
+  train_data = []
+  for img in os.listdir(DIR)
+    label = label_img(img)
+    path = os.path.join(DIR, img)
+    img = Image.open(path)
+    img = img.convert('L')
+    img = img.resize((IMG_SIZE, IMG_SIZE), Image.ANTIALIAS)
+    train_data.append([np.array(img), label])
+    # Basic Data Augmentation - Horizontal Flipping
+    flip_img = Image.open(path)
+    flip_img = flip_img.convert('L')
+    flip_img = flip_img.resize((IMG_SIZE, IMG_SIZE), Image.ANTIALIAS)
+    flip_img = np.array(flip_img)
+    flip_img = np.fliplr(flip_img)
+    train_data.append([flip_img, label])
+  shuffle(train_data)
+  return train_data
+  train_data = load_training_data()
+plt.imshow(train_data[43][0], cmap = 'gist_gray')
+
+model = Sequential()
+model.add(Conv2D(32, kernel_size = (3, 3), activation='relu', input_shape=(IMG_SIZE, IMG_SIZE, 1)))
+model.add(MaxPooling2D(pool_size=(2,2)))
+model.add(BatchNormalization())
+model.add(Conv2D(64, kernel_size=(3,3), activation='relu'))
+model.add(MaxPooling2D(pool_size=(2,2)))
+model.add(BatchNormalization())
+model.add(Conv2D(64, kernel_size=(3,3), activation='relu'))
+model.add(MaxPooling2D(pool_size=(2,2)))
+model.add(BatchNormalization())
+model.add(Conv2D(96, kernel_size=(3,3), activation='relu'))
+model.add(MaxPooling2D(pool_size=(2,2)))
+model.add(BatchNormalization())
+model.add(Conv2D(32, kernel_size=(3,3), activation='relu'))
+model.add(MaxPooling2D(pool_size=(2,2)))
+model.add(BatchNormalization())
+model.add(Dropout(0.2))
+model.add(Flatten())
+model.add(Dense(128, activation='relu'))
+#model.add(Dropout(0.3))
+model.add(Dense(2, activation = 'softmax'))
+
+loss, acc = model.evaluate(testImages, testLabels, verbose = 0)
+print(acc * 100)
